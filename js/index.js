@@ -55,8 +55,6 @@ document.getElementById('btnReintentarOffline').addEventListener('click', () => 
     }
 });
 
-
-
 const TABLE_USERS = 'users';
 const TABLE_ADDONS = 'addons';
 const TABLE_LIKES = 'likes';
@@ -130,7 +128,6 @@ async function verificarSesionYBloquearPublicar() {
             }
         });
 
-
         try {
             const doc = await mcDB.obtenerPerfil(sessionUser.id);
 
@@ -167,7 +164,6 @@ async function obtenerLikesUsuario() {
     }
 }
 
-// La lista se guarda en localStorage unos minutos (ver js/db.js) para no pedirla en cada visita
 async function obtenerAddonsPublicados(forzar = false) {
     try {
         return await mcDB.listarAddons(forzar);
@@ -506,7 +502,6 @@ async function compilarTodosLosAddons() {
     mezclados.forEach(addon => contenedor.appendChild(crearTarjetaPremium(addon)));
 }
 
-/* ===================== Categorías ===================== */
 const CATEGORIAS = McShared.TIPOS.map(t => ({
     id: t.catId, tipo: t.id, nombre: t.plural, desc: t.desc,
     c: t.c, osc: t.osc, t: t.t, icono: t.icono
@@ -673,7 +668,6 @@ async function renderizarDetalleCategoria(id) {
     await pintarGridCategoria();
 }
 
-/* ===================== Vistas y navegación ===================== */
 let vistaActual = 'inicio';
 
 async function cambiarVista(vista, opts = {}) {

@@ -623,7 +623,6 @@ body {
     width: 100%;
 }
 
-/* La tarjeta (pixel) vive en css/pixel.css. Aquí solo la carga de imagen. */
 .addon-premium-img {
     opacity: 0;
     transition: transform 0.5s ease, opacity 0.3s ease;
@@ -758,7 +757,6 @@ body {
     transform: translateY(3px);
 }
 
-/* ========== Categorías ========== */
 .seccion-dinamica-categorias {
     display: none;
     width: 100%;

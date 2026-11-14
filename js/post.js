@@ -125,7 +125,6 @@ window.addEventListener('resize', () => {
     }
 });
 
-/* ====================== Formulario por tipos ====================== */
 const T = window.McShared;
 const MAX_REFERENCIAS = 6;
 const MAX_VIDEOS = 5;
@@ -202,7 +201,6 @@ function mostrarMensaje(texto) {
     mensajePost.classList.toggle('visible', !!texto);
 }
 
-/* ---------- Selector de tipo ---------- */
 function renderizarSelectorTipo() {
     selectorTipo.innerHTML = T.TIPOS.map(t => `
         <button type="button" class="tipo-opcion ${t.id === estado.tipo ? 'seleccionado' : ''}" data-tipo="${t.id}"
@@ -239,7 +237,6 @@ function aplicarTipo() {
     inputEtiquetas.placeholder = tx.etiquetas;
     btnPublicar.textContent = idEdicion ? 'Guardar cambios' : tx.boton;
 
-    // Mecánicas propias de cada tipo
     const soloAddon = t === 'addon';
     el('opcionalVersion').hidden = soloAddon;
     el('opcionalPlataforma').hidden = soloAddon;
@@ -248,7 +245,6 @@ function aplicarTipo() {
     validar();
 }
 
-/* ---------- Zonas de imagen ---------- */
 function configurarZona(zona, input, preview, btnQuitar, clave, ajustes) {
     zona.addEventListener('click', () => input.click());
     input.addEventListener('change', async (e) => {
@@ -295,7 +291,6 @@ const previewBanner = el('previewBanner');
 configurarZona(zonaPortada, el('inputPortada'), previewPortada, el('btnQuitarPortada'), 'portada', mcDB.ajustes.portadas);
 configurarZona(zonaBanner, el('inputBanner'), previewBanner, el('btnQuitarBanner'), 'banner', mcDB.ajustes.banners);
 
-/* ---------- Imágenes adicionales ---------- */
 const zonaReferencias = el('zonaReferencias');
 const inputReferencias = el('inputReferencias');
 const scrollReferencias = el('scrollReferencias');
@@ -346,7 +341,6 @@ function renderizarReferencias() {
     zonaReferencias.classList.toggle('deshabilitada', estado.referencias.length >= MAX_REFERENCIAS);
 }
 
-/* ---------- Videos (URL) ---------- */
 const listaVideos = el('listaVideos');
 const btnAgregarVideo = el('btnAgregarVideo');
 
@@ -399,7 +393,6 @@ function recolectarVideos() {
     return Array.from(listaVideos.querySelectorAll('.campo-video')).map(c => c.value.trim()).filter(Boolean);
 }
 
-/* ---------- Plataforma (Add-On / Modelo / Sprites) ---------- */
 const btnBedrock = el('btnPlataformaBedrock');
 const btnJava = el('btnPlataformaJava');
 btnBedrock.addEventListener('click', () => {
@@ -417,7 +410,6 @@ btnJava.addEventListener('click', () => {
     validar();
 });
 
-/* ---------- Botones de descarga ---------- */
 const listaBotonesDescarga = el('listaBotonesDescarga');
 const btnAgregarDescarga = el('btnAgregarDescarga');
 
@@ -484,7 +476,6 @@ function recolectarBotonesDescarga() {
     })).filter(b => b.url && b.nombre);
 }
 
-/* ---------- Interruptores estilo Minecraft ---------- */
 function pintarToggle(btn, activo, textoOn, textoOff) {
     btn.setAttribute('aria-checked', activo ? 'true' : 'false');
     btn.querySelector('.mc-toggle-estado').textContent = activo ? (textoOn || 'SÍ') : (textoOff || 'NO');
@@ -541,7 +532,6 @@ function leerPrecio() {
     return isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0;
 }
 
-/* ---------- Servidor ---------- */
 const inputIp = el('inputIp');
 const inputPuerto = el('inputPuerto');
 const inputPuertoExtra = el('inputPuertoExtra');
@@ -604,7 +594,6 @@ function puertoEsValido(valor) {
     return /^\d+$/.test(valor.trim()) && n >= 1 && n <= 65535;
 }
 
-// Si pegan "ip:puerto" en el campo de la IP, se separan solos
 inputIp.addEventListener('blur', () => {
     const limpio = normalizarIp(inputIp.value);
     const m = limpio.match(/^([^:\s]+):(\d{1,5})$/);
@@ -642,7 +631,6 @@ el('redesGrid').querySelectorAll('.campo-red-input').forEach(inp => {
     });
 });
 
-/* ---------- Validación ---------- */
 function evaluar() {
     const falta = [];
     const t = estado.tipo;
@@ -677,7 +665,6 @@ function evaluar() {
             if (!estado.plataformaAddon) falta.push('la plataforma');
         }
         let hayBotonIncompleto = false;
-        // En publicaciones de pago la URL de descarga no es necesaria (se vende por contacto)
         if (!estado.precioActivo) listaBotonesDescarga.querySelectorAll('.fila-boton-descarga').forEach(fila => {
             const u = fila.querySelector('.campo-url-descarga').value.trim();
             const n = fila.querySelector('.campo-nombre-descarga').value.trim();
@@ -709,7 +696,6 @@ function validar() {
     c.addEventListener('input', validar);
 });
 
-/* ---------- Publicar / Guardar ---------- */
 function construirRegistro() {
     const t = estado.tipo;
     const reg = {
@@ -790,19 +776,16 @@ btnPublicar.addEventListener('click', async () => {
     btnPublicar.textContent = idEdicion ? 'Guardando...' : 'Publicando...';
     btnPublicar.classList.remove('habilitado');
 
-    // Agrupa las subidas de este guardado: si algo falla se borran las recién subidas
     const imagenes = mcDB.imagenes.sesion(currentUser.id);
 
     try {
         const registro = construirRegistro();
 
-        // 1) Imágenes nuevas -> Storage. Las que ya estaban subidas se dejan tal cual.
         registro.portada = await imagenes.subir('portadas', estado.portada);
         registro.banner = await imagenes.subir('banners', estado.banner);
         const referencias = await imagenes.subirVarias('galeria', estado.referencias);
         registro.referencias = JSON.stringify(referencias);
 
-        // 2) Guardar la publicación
         let idDestino = idEdicion;
         if (idEdicion) {
             const { data, error } = await mcDB.from('addons').update(registro).eq('id', idEdicion).select('id');
@@ -815,8 +798,6 @@ btnPublicar.addEventListener('click', async () => {
             idDestino = data.id;
         }
 
-        // 3) Todo salió bien: se borran de Storage las imágenes anteriores que ya no se usan
-        //    (las que se reemplazaron o se quitaron en esta edición)
         if (idEdicion && addonEdicion) {
             await imagenes.limpiar(
                 urlsImagenesDe(addonEdicion),
@@ -839,7 +820,6 @@ function mostrarUsoAlmacenamiento() {
     el('usoAlmacenamiento').textContent = 'Las imágenes se optimizan y se guardan en la nube. Si reemplazas o quitas una, la anterior se elimina automáticamente.';
 }
 
-/* ---------- Modo edición ---------- */
 async function cargarEdicion() {
     let data = null;
     try { data = await mcDB.obtenerAddon(idEdicion, true); } catch (e) { data = null; }

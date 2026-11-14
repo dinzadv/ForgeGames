@@ -1,28 +1,6 @@
-/* =====================================================
-   ForgeGames — Cliente de Supabase (window.mcDB)
-   - Conexión ofuscada (la URL y la clave no aparecen en texto plano)
-   - Bloqueo por dominio
-   - Caché en localStorage para reducir peticiones
-   - Imágenes: se comprimen, se suben a Storage y al reemplazarlas o
-     quitarlas se borra el archivo anterior
-
-   Necesita cargar antes:  @supabase/supabase-js (UMD)
-
-   IMPORTANTE: la clave "sb_publishable_..." está pensada para ser
-   pública. Ofuscarla solo evita que la vean a simple vista; lo que
-   realmente protege los datos son las políticas RLS del SQL.
-   NUNCA pongas aquí una clave "sb_secret_..." ni "service_role".
-   Para cambiar la clave:  node scripts/ofuscar.js <ID> <KEY>
-   ===================================================== */
 (function () {
     'use strict';
 
-    /* ---------- Dominios autorizados ---------- */
-    // Añade aquí tu dominio propio si usas uno (ej. 'forgegames.com').
-    var HOSTS_EXACTOS = ['', 'localhost', '127.0.0.1'];
-    var HOSTS_SUFIJO = ['.github.io'];
-
-    /* ---------- Configuración ofuscada ---------- */
     var _C = {
         u: ["Fehg0xsRSDYhfA", "==wWKH8lZM4dcz", "pYKvj51HmO2HUN", "E1USdDG63wdp9m"],
         k: ["+B8lWKQxVppauLph", "==AS5SllcXfZ5D7s", "QsZZW3XptemOdflL", "5E7Q8zg/AW5CkGn+"]
@@ -41,12 +19,10 @@
         return out;
     }
 
-    /* ---------- Utilidades de almacenamiento local ---------- */
     function lsLeer(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function lsEscribir(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
-    function lsBorrar(k) { try { localStorage.removeItem(k); } catch (e) { /* sin acción */ } }
+    function lsBorrar(k) { try { localStorage.removeItem(k); } catch (e) { } }
 
-    /* ---------- Modo bloqueado (dominio no autorizado / sin librería) ---------- */
     function crearBloqueado(mensaje) {
         var resp = { data: { session: null, user: null }, error: { message: mensaje } };
         var proxy;
@@ -61,18 +37,14 @@
         return proxy;
     }
 
-    var host = (location.hostname || '').toLowerCase();
-    var autorizado = HOSTS_EXACTOS.indexOf(host) !== -1 || HOSTS_SUFIJO.some(function (s) {
-        return host.length > s.length && host.slice(-s.length) === s;
-    });
-
-    if (!autorizado) {
-        console.error('ForgeGames: este dominio no está autorizado.');
-        window.mcDB = crearBloqueado('Dominio no autorizado.');
-        return;
-    }
     if (!window.supabase || !window.supabase.createClient) {
-        console.error('ForgeGames: no se pudo cargar la librería de Supabase.');
+        console.error('ForgeGames: no se pudo cargar la librería de Supabase (revisa tu conexión o bloqueadores de contenido).');
+        window.addEventListener('DOMContentLoaded', function () {
+            var aviso = document.createElement('div');
+            aviso.textContent = 'No se pudo conectar con el servidor. Recarga la página o desactiva el bloqueador de contenido.';
+            aviso.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;padding:10px 16px;background:#b91c1c;color:#fff;font:14px sans-serif;text-align:center';
+            document.body.appendChild(aviso);
+        });
         window.mcDB = crearBloqueado('No se pudo conectar con el servidor.');
         return;
     }
@@ -83,13 +55,10 @@
             persistSession: true,
             autoRefreshToken: true,
             detectSessionInUrl: false,
-            storageKey: 'fg_auth' // evita que el ID del proyecto aparezca en la clave de localStorage
+            storageKey: 'fg_auth'
         }
     });
 
-    /* =====================================================
-       CACHÉ (localStorage + memoria)
-       ===================================================== */
     var PREFIJO_CACHE = 'fg_c1:';
     var memoria = {};
     var enVuelo = {};
@@ -102,7 +71,7 @@
             try {
                 var o = JSON.parse(raw);
                 if (o && typeof o.t === 'number') { memoria[k] = o; return o; }
-            } catch (e) { /* caché dañada */ }
+            } catch (e) { }
             lsBorrar(PREFIJO_CACHE + k);
             return null;
         },
@@ -112,12 +81,11 @@
             var txt;
             try { txt = JSON.stringify(o); } catch (e) { return; }
             if (!lsEscribir(PREFIJO_CACHE + k, txt)) {
-                cache.borrar(''); // sin espacio: se vacía la caché y se reintenta una vez
+                cache.borrar('');
                 memoria[k] = o;
                 lsEscribir(PREFIJO_CACHE + k, txt);
             }
         },
-        // Borra todas las entradas cuya clave empiece con el prefijo ('' = todas)
         borrar: function (prefijo) {
             prefijo = prefijo || '';
             Object.keys(memoria).forEach(function (k) { if (k.indexOf(prefijo) === 0) delete memoria[k]; });
@@ -127,11 +95,9 @@
                     var clave = localStorage.key(i);
                     if (clave && clave.indexOf(PREFIJO_CACHE + prefijo) === 0) aBorrar.push(clave);
                 }
-            } catch (e) { /* sin acción */ }
+            } catch (e) { }
             aBorrar.forEach(lsBorrar);
         },
-        // Devuelve el valor en caché si es reciente; si no, lo pide y lo guarda.
-        // Si la petición falla y hay un valor viejo, devuelve el viejo.
         obtener: function (k, ttlMs, pedir, forzar) {
             var e = cache.leer(k);
             if (e && !forzar && Date.now() - e.t < ttlMs) return Promise.resolve(e.v);
@@ -160,7 +126,6 @@
         return res.data;
     }
 
-    /* ---------- Consultas con caché ---------- */
     cliente.listarAddons = function (forzar) {
         return cache.obtener('addons', TTL.addons, async function () {
             return chequear(await cliente.from('addons').select('*').order('created_at', { ascending: false })) || [];
@@ -191,7 +156,6 @@
         }, forzar);
     };
 
-    // Mapa { addon_id: true } de los likes o favoritos del usuario
     cliente.idsDe = function (tabla, userId, forzar) {
         return cache.obtener(tabla + ':' + userId, TTL.ids, async function () {
             var filas = chequear(await cliente.from(tabla).select('addon_id').eq('user_id', userId)) || [];
@@ -201,7 +165,6 @@
         }, forzar);
     };
 
-    // Llamar después de crear / editar / borrar publicaciones
     cliente.invalidarContenido = function () {
         cache.borrar('addons');
         cache.borrar('addon:');
@@ -212,7 +175,6 @@
         cache.borrar('usuarios');
     };
 
-    // Al cerrar sesión se limpia lo privado del usuario
     cliente.auth.onAuthStateChange(function (evento) {
         if (evento === 'SIGNED_OUT') {
             cache.borrar('likes:');
@@ -222,9 +184,6 @@
         }
     });
 
-    /* =====================================================
-       IMÁGENES
-       ===================================================== */
     var AJUSTES = {
         'avatars': { max: 256, calidad: 0.82, cuadrada: true },
         'perfil-banners': { max: 1200, calidad: 0.7 },
@@ -232,22 +191,20 @@
         'banners': { max: 1100, calidad: 0.62 },
         'galeria': { ancho: 1200, alto: 675, calidad: 0.6 }
     };
-    // Alias que usan las pantallas del formulario
     AJUSTES.avatar = AJUSTES['avatars'];
     AJUSTES.perfilBanner = AJUSTES['perfil-banners'];
 
-    var MAX_ARCHIVO_ENTRADA = 20 * 1024 * 1024; // 20 MB antes de comprimir
+    var MAX_ARCHIVO_ENTRADA = 20 * 1024 * 1024;
 
     function formatoSalida() {
         try {
             var c = document.createElement('canvas');
             c.width = c.height = 1;
             if (c.toDataURL('image/webp').indexOf('data:image/webp') === 0) return 'image/webp';
-        } catch (e) { /* sin acción */ }
+        } catch (e) { }
         return 'image/jpeg';
     }
 
-    // Dibuja la imagen ya recortada / escalada en un canvas
     function procesarImagen(archivo, opciones) {
         var max = (opciones && opciones.max) || 960;
         return new Promise(function (resolver, rechazar) {
@@ -351,7 +308,6 @@
 
     var BASE_PUBLICA = URL_BASE + '/storage/v1/object/public/';
 
-    // https://<proyecto>.supabase.co/storage/v1/object/public/<bucket>/<ruta>  ->  { bucket, path }
     function rutaDesdeUrl(url) {
         if (typeof url !== 'string' || url.indexOf(BASE_PUBLICA) !== 0) return null;
         var resto = url.slice(BASE_PUBLICA.length).split('?')[0];
@@ -364,13 +320,11 @@
         }
     }
 
-    // Sube una imagen nueva (File/Blob o data URL) y devuelve su URL pública.
-    // El nombre es siempre único: así nunca se sirve una versión vieja desde la caché del CDN.
     async function subirImagen(bucket, userId, fuente) {
         var ajustes = AJUSTES[bucket] || AJUSTES.portadas;
         var blob;
         if (typeof fuente === 'string') blob = dataURLaBlob(fuente);
-        else blob = await imagenABlob(fuente, ajustes); // File sin comprimir
+        else blob = await imagenABlob(fuente, ajustes);
         var ext = blob.type === 'image/webp' ? 'webp' : (blob.type === 'image/png' ? 'png' : 'jpg');
         var ruta = userId + '/' + nuevoId() + '.' + ext;
         var res = await cliente.storage.from(bucket).upload(ruta, blob, {
@@ -383,7 +337,6 @@
         return pub.data.publicUrl;
     }
 
-    // Borra de Storage los archivos que correspondan a estas URLs (ignora las que no sean del proyecto)
     async function borrarImagenes(urls) {
         var porBucket = {};
         (urls || []).forEach(function (u) {
@@ -407,13 +360,6 @@
         return total;
     }
 
-    /* Sesión de imágenes: agrupa las subidas de un guardado.
-         const img = mcDB.imagenes.sesion(userId);
-         const url = await img.subir('portadas', valor);   // valor nuevo -> sube; URL existente -> la deja igual
-         ... guardar en la base ...
-         catch  -> await img.revertir();                     // borra lo recién subido
-         ok     -> await img.limpiar(urlsAnteriores, urlsFinales); // borra lo que ya no se usa
-    */
     function sesionImagenes(userId) {
         var subidas = [];
         return {

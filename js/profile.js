@@ -199,7 +199,6 @@ function actualizarRedesSocialesPerfil(doc) {
     });
 }
 
-/* ---------- Confirmación de eliminar (con cuenta regresiva de 5 s) ---------- */
 function confirmarEliminacion(nombreTipo, nombre) {
     return new Promise((resolve) => {
         const SEGUNDOS = 5;
@@ -328,7 +327,6 @@ async function cargarAddonsDelUsuario(userId, forzar) {
                         if (errorBorrar) throw errorBorrar;
                         if (!borrados || borrados.length === 0) throw new Error('No se pudo eliminar la publicación.');
 
-                        // La publicación ya no existe: se borran también sus imágenes de Storage
                         await mcDB.imagenes.borrar(urlsImagenesDe(addon));
                         mcDB.invalidarContenido();
 
@@ -350,7 +348,6 @@ async function cargarAddonsDelUsuario(userId, forzar) {
     }
 }
 
-// Acepta "https://..." o un dominio suelto (se le antepone https://). Vacío = sin enlace.
 function normalizarEnlace(valor, nombre) {
     let v = String(valor || '').trim();
     if (!v) return '';
@@ -383,7 +380,6 @@ btnGuardarEdicion.addEventListener('click', async () => {
         let urlAvatarFinal = avatarAnterior;
         let urlBannerFinal = bannerAnterior;
 
-        // 1) Si eligió una foto / banner nuevos: se comprimen y se suben a Storage
         if (archivoAvatarSeleccionado) {
             urlAvatarFinal = await imagenes.subir('avatars', archivoAvatarSeleccionado);
         }
@@ -391,7 +387,6 @@ btnGuardarEdicion.addEventListener('click', async () => {
             urlBannerFinal = await imagenes.subir('perfil-banners', archivoBannerSeleccionado);
         }
 
-        // 2) Guardar el perfil
         const { data, error } = await mcDB
             .from('users')
             .update({
@@ -411,7 +406,6 @@ btnGuardarEdicion.addEventListener('click', async () => {
         if (error) throw error;
         if (!data || data.length === 0) throw new Error('No se pudo guardar el perfil.');
 
-        // 3) Guardado correcto: se borran de Storage la foto / banner anteriores si fueron reemplazados
         await imagenes.limpiar([avatarAnterior, bannerAnterior], [urlAvatarFinal, urlBannerFinal]);
         mcDB.invalidarPerfil(usuarioActualDocumento.id);
 

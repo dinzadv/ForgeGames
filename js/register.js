@@ -1,5 +1,3 @@
-
-
 let usuarioDisponible = false;
 const USUARIO_VALIDO = /^[a-z0-9_]{3,20}$/;
 let timeoutBusqueda = null;
@@ -38,7 +36,6 @@ function verificarDisponibilidadUsuario() {
 
     feedback.style.display = 'block';
 
-    // El usuario forma el correo interno (usuario@mcpixel.com): solo letras, números y _
     if (!USUARIO_VALIDO.test(usuarioInput)) {
         clearTimeout(timeoutBusqueda);
         feedback.className = 'msg-validacion msg-error';
@@ -124,7 +121,6 @@ async function procesarRegistro(e) {
 
         if (error) throw error;
         if (!data.session) {
-            // Pasa cuando la confirmación por correo está activada en Supabase
             throw new Error('La cuenta se creó, pero no se pudo iniciar sesión. Desactiva "Confirm email" en Supabase (Authentication > Sign In / Providers > Email).');
         }
 

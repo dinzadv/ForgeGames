@@ -1,11 +1,6 @@
-/* =====================================================
-   ForgeGames — utilidades compartidas
-   Tipos de publicación, precios, videos y tarjetas.
-   ===================================================== */
 (function () {
     'use strict';
 
-    /* ---------- Tipos de publicación ---------- */
     var TIPOS = [
         {
             id: 'addon', catId: 'addons', nombre: 'Add-On', plural: 'Add-Ons',
@@ -39,7 +34,7 @@
 
     function tipoDe(addon) {
         var id = addon && addon.tipo;
-        return TIPO_POR_ID[id] ? id : 'addon'; // las publicaciones antiguas eran Add-Ons
+        return TIPO_POR_ID[id] ? id : 'addon';
     }
 
     function svgTipo(t) {
@@ -50,7 +45,6 @@
         return '--c:' + t.c + ';--c-osc:' + t.osc + ';--texto:' + t.t + ';--cc:' + t.c + ';--cco:' + t.osc + ';--ct:' + t.t;
     }
 
-    /* ---------- Monedas ---------- */
     var MONEDAS = [
         ['USD', 'Dólar estadounidense', 'Estados Unidos', '$'],
         ['EUR', 'Euro', 'Eurozona', '€'],
@@ -102,7 +96,6 @@
         return simboloMoneda(addon.precio_moneda) + txt + ' ' + (addon.precio_moneda || '');
     }
 
-    /* ---------- Contacto de ventas ---------- */
     var NOMBRE_TIPO_VENTA = { addon: 'Add-On', modelo: 'Modelo', sprites: 'Sprite' };
 
     function contactoVenta(addon) {
@@ -122,7 +115,6 @@
         return 'Quiero comprar este ' + tipo + ' ' + (addon.nombre || '') + '\n' + url;
     }
 
-    /* ---------- Texto y números ---------- */
     function esc(t) {
         return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -159,7 +151,6 @@
         }
     }
 
-    /* ---------- Videos ---------- */
     function parsearVideo(url) {
         url = String(url || '').trim();
         if (!url) return null;
@@ -171,7 +162,7 @@
                 miniatura: 'https://img.youtube.com/vi/' + m[1] + '/hqdefault.jpg'
             };
         }
-        if (/^[A-Za-z0-9_-]{11}$/.test(url)) { // solo el ID (publicaciones antiguas)
+        if (/^[A-Za-z0-9_-]{11}$/.test(url)) {
             return {
                 tipo: 'youtube', id: url, url: 'https://youtu.be/' + url,
                 embed: 'https://www.youtube.com/embed/' + url + '?rel=0',
@@ -198,7 +189,6 @@
         });
     }
 
-    /* ---------- Servidores ---------- */
     var PLATAFORMAS_SERVIDOR = { java: 'Java', bedrock: 'Bedrock', realms: 'Realms' };
     var PUERTO_POR_DEFECTO = { java: '25565', bedrock: '19132' };
 
@@ -220,7 +210,6 @@
         return puerto && puerto !== PUERTO_POR_DEFECTO[addon.plataforma] ? ip + ':' + puerto : ip;
     }
 
-    /* ---------- Tarjeta por tipo ---------- */
     var ICONO_LIKE = '<svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>';
     var ICONO_DESCARGA = '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
     var ICONO_RELOJ = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
@@ -239,7 +228,6 @@
         var destinoError = opciones.imgError || '';
         var onError;
         if (bannerTarjeta && addon.portada && addon.portada !== bannerTarjeta) {
-            // si el banner falla, probar con la portada
             onError = "this.onerror=" + (destinoError
                 ? "function(){this.onerror=null;this.src='" + destinoError + "'}"
                 : "function(){this.style.display='none'}") + ";this.src='" + esc(addon.portada) + "'";

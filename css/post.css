@@ -670,7 +670,6 @@ input[type="file"] {
     }
 }
 
-/* ================= Formulario por tipos (pixel) ================= */
 [data-tipos][hidden],
 [hidden].mc-toggle {
     display: none !important;
@@ -772,7 +771,6 @@ input[type="file"] {
     overflow: hidden;
 }
 
-/* Interruptor estilo Minecraft */
 .mc-toggle {
     --n: 4px;
     --b: 5px;
@@ -818,7 +816,6 @@ input[type="file"] {
     letter-spacing: 0.6px;
 }
 
-/* Selector largo Java / Bedrock / Realms */
 .selector-largo {
     --n: 6px;
     --b: 5px;
@@ -995,7 +992,6 @@ input[type="file"] {
     display: block;
 }
 
-/* Botones del formulario en estilo pixel */
 .btn-plataforma {
     --n: 4px;
     --b: 5px;
@@ -1114,7 +1110,6 @@ input[type="file"] {
     line-height: 1.45;
     color: var(--texto-secundario);
 }
-
 
 .titulo-post-fila {
     display: flex;

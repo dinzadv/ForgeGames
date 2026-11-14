@@ -339,8 +339,6 @@ body {
     width: 100%;
 }
 
-
-
 .mensaje-usuario-no-encontrado {
     display: flex;
     flex-direction: column;
@@ -363,7 +361,6 @@ body {
     font-weight: 600;
 }
 
-/* ---------- Estadísticas por tipo ---------- */
 .tarjeta-estadistica.estadistica-tipo {
     border-left: 3px solid var(--c, var(--color-acento));
 }
@@ -385,7 +382,6 @@ body {
     flex-shrink: 0;
 }
 
-/* ---------- Cabecera, orden y pestañas ---------- */
 .publicaciones-cabecera {
     display: flex;
     align-items: center;
@@ -488,7 +484,6 @@ body {
     background: rgba(0, 0, 0, 0.25);
 }
 
-/* ---------- Extras en tarjetas normales ---------- */
 .tarjeta-premium-addon .perfil-tarjeta-extra {
     display: flex;
     flex-wrap: wrap;
@@ -513,7 +508,6 @@ body {
     background: rgba(99, 102, 241, 0.12);
 }
 
-/* ---------- Tarjeta de servidor (detallada) ---------- */
 .tarjeta-servidor {
     --c: #43b039;
     --c-osc: #2c8a26;
@@ -783,9 +777,6 @@ body {
     }
 }
 
-/* =====================================================
-   Diseño pixel art (mismo estilo que .btn-pixel)
-   ===================================================== */
 .perfil-tab,
 .srv-btn,
 .srv-enlace,
@@ -803,7 +794,6 @@ body {
     clip-path: polygon(var(--n) 0, calc(100% - var(--n)) 0, calc(100% - var(--n)) var(--n), 100% var(--n), 100% calc(100% - var(--b)), calc(100% - var(--n)) calc(100% - var(--b)), calc(100% - var(--n)) 100%, var(--n) 100%, var(--n) calc(100% - var(--b)), 0 calc(100% - var(--b)), 0 var(--n), var(--n) var(--n));
 }
 
-/* Botones: pestañas, copiar/unirse, enlaces, redes */
 .perfil-tab,
 .srv-btn,
 .srv-enlace,
@@ -888,7 +878,6 @@ body {
     color: #cbd5e1;
 }
 
-/* Tarjetas de estadísticas */
 .tarjeta-estadistica {
     --c: #1c202d;
     --c-osc: #0b0d14;
@@ -901,7 +890,6 @@ body {
     --c-osc: var(--c-tipo, #0b0d14);
 }
 
-/* Tarjeta de servidor */
 .tarjeta-servidor {
     --n: 6px;
     --b: 6px;
@@ -960,9 +948,6 @@ body {
     color: #e0e7ff;
 }
 
-/* =====================================================
-   Portada del perfil: banner pegado arriba y avatar pixel
-   ===================================================== */
 .perfil-banner-seccion {
     margin: -24px -16px 70px -16px;
     width: auto;
@@ -975,7 +960,6 @@ body {
     background: repeating-conic-gradient(#171a24 0 25%, #1c202d 0 50%) 0 0 / 32px 32px;
 }
 
-/* Desvanecido hacia el fondo de la página */
 .perfil-banner::after {
     content: "";
     position: absolute;
@@ -988,7 +972,6 @@ body {
     left: 24px;
 }
 
-/* Avatar cuadrado con esquinas pixel (mismo recorte que los botones) */
 .marco-avatar-invisible {
     --n: 8px;
     width: 104px;

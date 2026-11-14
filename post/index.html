@@ -7,7 +7,8 @@
     <title>Publicar - ForgeGames</title>
     <link rel="stylesheet" href="../css/pixel.css">
     <link rel="stylesheet" href="../css/post.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"></script>
+    <script>window.supabase||document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.57.4/dist/umd/supabase.js"><\/script>')</script>
     <script src="../js/db.js"></script>
     <script src="../js/mcshared.js"></script>
 </head>
@@ -208,7 +209,6 @@
                 <textarea class="input-texto-base" id="inputDescripcionAddon" placeholder="Describe de qué trata, sus características y cómo funciona..."></textarea>
             </div>
 
-            <!-- ======== Solo Servidor ======== -->
             <div class="campo-grupo" data-tipos="servidor" hidden>
                 <div class="campo-etiqueta">
                     <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="7" rx="1"/><rect x="2" y="14" width="20" height="7" rx="1"/><path d="M6 6.5h.01M6 17.5h.01"/></svg>
@@ -292,7 +292,6 @@
                 <p class="ayuda-campo">Sepáralas con comas.</p>
             </div>
 
-            <!-- ======== Add-On / Modelo / Menús y Sprites ======== -->
             <div class="campo-grupo" data-tipos="addon modelo sprites">
                 <div class="campo-etiqueta">
                     <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
@@ -375,7 +374,6 @@
                 </div>
             </div>
 
-            <!-- ======== Redes del servidor ======== -->
             <div class="campo-grupo" data-tipos="servidor" hidden>
                 <div class="campo-etiqueta">
                     <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>

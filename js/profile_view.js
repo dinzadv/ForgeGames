@@ -270,7 +270,6 @@ async function cargarPerfilUsuario() {
     pintarPublicaciones();
 }
 
-/* ================= Publicaciones por tipo ================= */
 const estadoPublicaciones = { todas: [], tab: 'todo', orden: 'recientes' };
 const T = McShared;
 
@@ -373,7 +372,7 @@ function ordenarPublicaciones(lista) {
     } else if (orden === 'descargas') {
         copia.sort((a, b) => (parseInt(b.descargas) || 0) - (parseInt(a.descargas) || 0));
     }
-    return copia; // "recientes": ya vienen ordenadas por created_at desc
+    return copia;
 }
 
 function listaEtiquetas(pub) {
@@ -419,7 +418,6 @@ function tarjetaServidor(srv) {
     }
     datos.push(['Publicado', T.fechaCorta(srv)]);
 
-    // Botón principal: copiar IP, o unirse al Realm
     let accionPrincipal = '';
     const enlaceRealm = T.urlSegura(srv.realm_enlace);
     if (esRealm) {
@@ -430,7 +428,6 @@ function tarjetaServidor(srv) {
         accionPrincipal = '<button type="button" class="srv-btn srv-copiar" data-ip="' + T.esc(T.textoIp(srv)) + '">Copiar</button>';
     }
 
-    // Enlaces sociales del servidor
     const redes = [];
     if (T.urlSegura(srv.web_url)) redes.push(['Web', srv.web_url]);
     if (T.urlSegura(srv.discord_url)) redes.push(['Discord', srv.discord_url]);
@@ -479,7 +476,7 @@ function tarjetaServidor(srv) {
                 tmp.value = ip;
                 document.body.appendChild(tmp);
                 tmp.select();
-                try { document.execCommand('copy'); } catch (e2) { /* sin portapapeles */ }
+                try { document.execCommand('copy'); } catch (e2) { }
                 tmp.remove();
             }
             btnCopiar.textContent = '¡Copiada!';
@@ -499,7 +496,6 @@ function pintarPublicaciones() {
 
     titulo.textContent = tab === 'todo' ? 'Publicaciones' : T.TIPO_POR_ID[tab].plural + ' publicados';
 
-    // "Descargas" no aplica a servidores
     const optDescargas = document.querySelector('#selOrden option[value="descargas"]');
     if (optDescargas) optDescargas.hidden = tab === 'servidor';
     if (tab === 'servidor' && estadoPublicaciones.orden === 'descargas') {

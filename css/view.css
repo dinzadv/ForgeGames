@@ -1129,7 +1129,6 @@ body {
     }
 }
 
-/* ===== Tipos de publicación, servidor y redes ===== */
 .fila-chips-view {
     display: flex;
     flex-wrap: wrap;
@@ -1299,7 +1298,6 @@ body {
     }
 }
 
-/* ---------- Modal de contacto para compras ---------- */
 #modalContactoVenta {
     align-items: center;
 }
@@ -1390,7 +1388,6 @@ body {
     display: none;
 }
 
-/* Galería: imagen completa que llena todo el recuadro */
 .galeria-principal .galeria-fondo {
     position: absolute;
     inset: -24px;
@@ -1412,8 +1409,6 @@ body {
     object-fit: contain;
 }
 
-
-/* ===== README de la descripción (gestos de formato) ===== */
 .descripcion-addon > * + * {
     margin-top: 0.7em;
 }
@@ -1457,7 +1452,6 @@ body {
     background: repeating-linear-gradient(90deg, rgba(255,255,255,0.14) 0 8px, transparent 8px 12px);
 }
 
-/* `código` en línea */
 .descripcion-addon .md-codigo {
     padding: 1px 6px;
     background: #05060a;
@@ -1467,7 +1461,6 @@ body {
     font-size: 0.86em;
 }
 
-/* ```bloque de código``` */
 .descripcion-addon .md-bloque {
     --n: 5px;
     padding: 14px 16px;
@@ -1484,7 +1477,6 @@ body {
     white-space: pre;
 }
 
-/* /comando: verde sobre negro, subrayado */
 .descripcion-addon .md-comando {
     padding: 1px 6px;
     background: #000000;
@@ -1496,7 +1488,6 @@ body {
     white-space: nowrap;
 }
 
-/* -# subtexto: texto pequeño y atenuado (como en Discord) */
 .descripcion-addon .md-subtexto {
     font-size: 0.78em;
     line-height: 1.4;

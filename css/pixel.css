@@ -396,11 +396,6 @@ aside.sidebar::-webkit-scrollbar {
     clip-path: polygon(var(--n) 0, calc(100% - var(--n)) 0, calc(100% - var(--n)) var(--n), 100% var(--n), 100% calc(100% - var(--b)), calc(100% - var(--n)) calc(100% - var(--b)), calc(100% - var(--n)) 100%, var(--n) 100%, var(--n) calc(100% - var(--b)), 0 calc(100% - var(--b)), 0 var(--n), var(--n) var(--n));
 }
 
-/* =====================================================
-   Tarjeta de add-on (estilo pixel) — compartida por
-   index, explore, profile y profile_view
-   ===================================================== */
-
 .tarjeta-premium-addon {
     --n: 6px;
     --b: 5px;
@@ -516,7 +511,6 @@ aside.sidebar::-webkit-scrollbar {
     stroke: #a5b4fc;
 }
 
-/* Likes: mismo diseño pixel que el chip de descargas */
 .addon-badge-votos,
 .tag-likes {
     --n: 4px;
@@ -548,7 +542,6 @@ aside.sidebar::-webkit-scrollbar {
     flex-shrink: 0;
 }
 
-/* Fecha con reloj: chip pixel más tenue que el de descargas */
 .addon-premium-meta-item.meta-fecha {
     --n: 4px;
     --b: 4px;
@@ -568,10 +561,6 @@ aside.sidebar::-webkit-scrollbar {
 .addon-premium-meta-item.meta-fecha svg {
     stroke: #818cf8;
 }
-
-/* =====================================================
-   Chips por tipo de publicación (tarjetas)
-   ===================================================== */
 
 .addon-premium-pie {
     position: absolute;

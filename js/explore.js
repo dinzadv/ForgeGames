@@ -47,7 +47,6 @@ async function verificarSesion() {
             }
         });
 
-
         try {
             const doc = await mcDB.obtenerPerfil(session.user.id);
 

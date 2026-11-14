@@ -114,32 +114,22 @@ function formatearNumero(num) {
     return num.toString();
 }
 
-/* ---------- README: gestos de formato ----------
-   # Título  ## Subtítulo  ### Sección   (con espacio después del #)
-   **negrita**  *cursiva*  ~~tachado~~  `código`  ```bloque```
-   -# subtexto (texto pequeño)   > cita   - lista   1. lista numerada   ---  [texto](https://...)
-   /comando  (solo si empieza una palabra: "texto/texto" NO es comando)  */
 function formatearInline(linea) {
     const guardados = [];
     const guardar = (html) => '\u0000' + (guardados.push(html) - 1) + '\u0000';
     let t = T.esc(linea);
 
-    // `código` (se protege antes de cualquier otro formato)
     t = t.replace(/`([^`\n]+)`/g, (m, c) => guardar('<code class="md-codigo">' + c + '</code>'));
 
-    // [texto](https://...)
     t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (m, txt, url) =>
         guardar('<a href="' + url + '" target="_blank" rel="noopener noreferrer nofollow">' + txt + '</a>'));
 
-    // URLs sueltas
     t = t.replace(/https?:\/\/[^\s\u0000]+/g, (m) => {
         const limpio = m.replace(/(?:&quot;|&#39;|&lt;|&gt;|[.,;:!?)])+$/, '');
         const resto = m.slice(limpio.length);
         return guardar('<a href="' + limpio + '" target="_blank" rel="noopener noreferrer nofollow">' + limpio + '</a>') + resto;
     });
 
-    // /comando: debe ir al inicio o tras un espacio/paréntesis, y terminar en espacio, signo o fin.
-    // "texto/texto", "a/b" o "/ruta/larga" no cuentan.
     t = t.replace(/(^|[\s(])\/([a-zA-Z][\w-]*(?::[\w-]+)?)(?=$|[\s.,;:!?)])/g,
         (m, pre, cmd) => pre + guardar('<span class="md-comando">/' + cmd + '</span>'));
 
@@ -156,7 +146,7 @@ function procesarDescripcion(texto) {
     const lineas = String(texto).replace(/\r\n?/g, '\n').split('\n');
     const salida = [];
     let parrafo = [];
-    let lista = null; // { tipo: 'ul' | 'ol', items: [] }
+    let lista = null;
 
     const cerrarParrafo = () => {
         if (parrafo.length) salida.push('<p>' + parrafo.map(formatearInline).join('<br>') + '</p>');
@@ -172,7 +162,6 @@ function procesarDescripcion(texto) {
     for (let i = 0; i < lineas.length; i++) {
         const linea = lineas[i];
 
-        // Bloque de código ```
         if (/^\s*```/.test(linea)) {
             cerrarParrafo(); cerrarLista();
             const codigo = [];
@@ -435,7 +424,6 @@ async function manejarDescarga(e, addon, boton) {
         document.getElementById('descargasMeta').textContent = formatearNumero(descargas) + ' descargas';
         localStorage.setItem('mcpixel_ultima_descarga_' + addon.id, ahora.toString());
         try {
-            // Función segura de la base de datos: solo suma 1 (no se puede escribir un número cualquiera)
             const { data: total, error } = await mcDB.rpc('registrar_descarga', { p_addon_id: addon.id });
             if (error) throw error;
             if (typeof total === 'number') {
@@ -453,7 +441,6 @@ async function manejarDescarga(e, addon, boton) {
     }
 }
 
-/* ---------- Contacto con el vendedor (compra) ---------- */
 const SVG_WHATSAPP = '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5h.5a8.5 8.5 0 0 1 8 8z"/></svg>';
 const SVG_DISCORD = '<svg viewBox="0 0 24 24"><path d="M20 4a17 17 0 0 0-4.2-1.3l-.5 1a15 15 0 0 0-4.6 0l-.5-1A17 17 0 0 0 6 4C3.5 8 2.8 11.800 3.100 15.500A17 17 0 0 0 8.200 18l1-1.600a11 11 0 0 1-1.600-.8l.4-.3a12 12 0 0 0 8 0l.4.3a11 11 0 0 1-1.600.8l1 1.600a17 17 0 0 0 5.100-2.500C21.200 11.200 20.300 7.600 20 4z"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/></svg>';
 
@@ -644,7 +631,6 @@ function renderizarExtrasPorTipo(addon, idTipo) {
     const tipo = T.TIPO_POR_ID[idTipo];
     const esServidor = idTipo === 'servidor';
 
-    // Chips junto al título: tipo, precio y plataforma
     const chips = [];
     chips.push(`<span class="chip-tipo" style="${T.estiloTipo(tipo)}">${T.svgTipo(tipo)}<span>${T.esc(tipo.nombre)}</span></span>`);
     if (!esServidor) {
@@ -660,12 +646,10 @@ function renderizarExtrasPorTipo(addon, idTipo) {
 
     document.getElementById('tituloPagina').textContent = 'Ver ' + tipo.nombre;
 
-    // Sección de descarga: si tiene precio, se llama "Obtener"
     if (!esServidor && T.precioActivo(addon)) {
         document.getElementById('tituloDescarga').textContent = 'Obtener (' + T.textoPrecio(addon) + ')';
     }
 
-    // Servidor: datos de conexión y redes
     const seccionServidor = document.getElementById('seccionServidor');
     const seccionRedes = document.getElementById('seccionRedes');
     seccionServidor.style.display = 'none';
@@ -984,7 +968,6 @@ async function renderizarView() {
                 contenedorPrincipal.appendChild(caja);
             }
         } else {
-            // Fondo difuminado + imagen completa: llena todo el recuadro sin recortar
             const fondo = document.createElement('div');
             fondo.className = 'galeria-fondo';
             fondo.style.backgroundImage = 'url("' + String(item.src).replace(/"/g, '%22') + '")';
@@ -1050,7 +1033,6 @@ async function renderizarView() {
         btnMeGusta.dataset.ocupado = '1';
         const ya = userLikes[addon.id] || false;
         try {
-            // El contador de likes del addon lo actualiza la base de datos sola (trigger)
             const res = ya
                 ? await mcDB.from('likes').delete().eq('user_id', currentUser.id).eq('addon_id', addon.id)
                 : await mcDB.from('likes').insert({ user_id: currentUser.id, addon_id: addon.id });
