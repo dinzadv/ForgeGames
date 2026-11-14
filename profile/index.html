@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link class="forgegames-logo-ref" rel="icon" type="image/png" href="../img/logo.png">
+    <title>ForgeGames - Perfil</title>
+    <link rel="stylesheet" href="../css/pixel.css">
+    <link rel="stylesheet" href="../css/profile.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" crossorigin="anonymous"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/mcshared.js"></script>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-izquierda">
+            <img src="../img/logo.png" alt="ForgeGames Logo" class="logo" id="logoInicio">
+        </div>
+
+        <div class="perfil-contenedor" id="perfilBtn">
+            <svg viewBox="0 0 24 24" id="perfilIconSvg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+    </header>
+
+    <aside class="sidebar" id="sidebarMenu">
+        <div class="sidebar-cuenta-estado" id="contenedorAutenticacion" style="display: none;">
+            <span class="cuenta-anonima-texto">Disfruta de ForgeGames al máximo creando una cuenta.</span>
+            <div class="sidebar-auth-botones">
+                <a id="btnAuthLoginMenu" href="../login/" class="btn-auth-login">Entrar</a>
+                <a id="btnAuthRegistroMenu" href="../register/" class="btn-auth-registro">Registro</a>
+            </div>
+        </div>
+
+        <div class="sidebar-divisor"></div>
+
+        <a id="menuLinkInicio" href="../" class="btn-sidebar">
+            <div class="btn-sidebar-contenido">
+                <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                <span>Inicio</span>
+            </div>
+        </a>
+        <a id="menuLinkCategorias" href="../#categorias" class="btn-sidebar">
+            <div class="btn-sidebar-contenido">
+                <svg viewBox="0 0 24 24"><path d="M4 5h7v7H4zm10 0h7v7h-7zM4 14h7v7H4zm10 0h7v7h-7z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Categorías</span>
+            </div>
+        </a>
+        <a id="menuLinkExplorar" href="../explore/" class="btn-sidebar">
+            <div class="btn-sidebar-contenido">
+                <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <span>Explorar</span>
+            </div>
+        </a>
+        <a id="menuLinkModelos" href="../#categoria-modelos" class="btn-sidebar">
+            <div class="btn-sidebar-contenido">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                <span>Modelos</span>
+            </div>
+        </a>
+        <a id="menuLinkSprites" href="../#categoria-sprites" class="btn-sidebar">
+            <div class="btn-sidebar-contenido">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                <span>Sprites/Menús</span>
+            </div>
+        </a>
+        <a href="../#categoria-servidores" class="btn-sidebar" id="menuLinkServidores">
+            <div class="btn-sidebar-contenido">
+                <svg viewBox="0 0 24 24"><path d="M4 14h16v7H4zm0-10h16v7H4zM6 7h.01M6 17h.01" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Servidores</span>
+            </div>
+        </a>
+
+        <div class="sidebar-divisor"></div>
+
+        <a href="../profile/" class="btn-sidebar activo-link" id="menuLinkPerfil">
+            <div class="btn-sidebar-contenido">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Perfil</span>
+            </div>
+        </a>
+        <a href="#" class="btn-sidebar deshabilitado" id="menuLinkFavoritos">
+            <div class="btn-sidebar-contenido">
+                <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                <span>Favoritos</span>
+            </div>
+        </a>
+        <div class="sidebar-divisor"></div>
+
+        <div class="sidebar-redes-fila">
+            <a href="https://discord.gg/9EkhYdV325" class="btn-red-cuadrado" title="Discord">
+                <svg viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.77-11,68.43,68.43,0,0,1-10.75-5.13c.91-.66,1.8-1.34,2.65-2a75.58,75.58,0,0,0,72.93,0c.85.69,1.74,1.37,2.65,2A68.44,68.44,0,0,1,96.1,85.37a74.49,74.49,0,0,0,6.77,11,105.73,105.73,0,0,0,31.06-18.83C130.1,49.22,124.27,26.4,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.88,46,53.88,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.12,46,96.12,53,91,65.69,84.69,65.69Z"/></svg>
+                <span>Discord</span>
+            </a>
+            <a href="https://www.tiktok.com/@mcpixelmx?_r=1&_t=ZS-97XdPkGNtKP" class="btn-red-cuadrado" title="TikTok">
+                <svg viewBox="0 0 448 512"><path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3V278.2a74.6 74.6 0 1 0 52.2 71.2V0l88 0a121.2 121.2 0 0 0 1.9 22.2h0A122.2 122.2 0 0 0 381 102.4a121.4 121.4 0 0 0 67 20.1z"/></svg>
+                <span>TikTok</span>
+            </a>
+        </div>
+
+        <button class="sidebar-toggle-pc" id="toggleCollapseBtn">
+            <svg viewBox="0 0 24 24" id="collapseIcon"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+    </aside>
+
+    <main class="contenedor-principal">
+        
+        <section class="perfil-banner-seccion">
+            <div class="perfil-banner" id="vistaBannerRaiz"></div>
+            <div class="perfil-identidad-bloque">
+                <div class="marco-avatar-invisible" id="perfilAvatarRaiz">
+                    <svg viewBox="0 0 24 24" id="svgAvatarPorDefecto"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <div class="perfil-nombres">
+                    <span class="perfil-nombre-visible" id="lblNombreVisible">Cargando...</span>
+                    <div class="perfil-nombre-usuario-wrapper">
+                        <span class="perfil-nombre-usuario" id="lblNombreUsuario">@...</span>
+                        <span class="badge-verificado" id="badgeVerificado">
+                            <svg viewBox="0 0 24 24" style="fill: #1d9bf0; width: 16px; height: 16px;"><path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.97-.81-4.01s-2.62-1.27-4.01-.81C14.67 2.53 13.43 1.65 12 1.65s-2.67.88-3.34 2.19c-1.39-.46-2.97-.2-4.01.81s-1.27 2.62-.81 4.01C2.53 9.33 1.65 10.57 1.65 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.97.81 4.01s2.62 1.27 4.01.81c.67 1.31 1.91 2.19 3.34 2.19s2.67-.88 3.34-2.19c1.39.46 2.97.2 4.01-.81s1.27-2.62.81-4.01c1.31-.67 2.19-1.91 2.19-3.34zm-11.71 4.2L6.8 12.46l1.41-1.42 2.26 2.26 4.8-5.23 1.47 1.36-6.2 6.77z"></path></svg>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-engranaje" id="btnAbrirEditor">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+        </section>
+
+        <p class="perfil-biografia-visualizacion" id="lblBiografia">Sin biografía disponible.</p>
+
+        <section class="perfil-estadisticas-grid">
+            <div class="tarjeta-estadistica">
+                <span class="estadistica-label">Add-Ons</span>
+                <span class="estadistica-valor" id="statAddons">0</span>
+            </div>
+            <div class="tarjeta-estadistica">
+                <span class="estadistica-label">Skins</span>
+                <span class="estadistica-valor">0</span>
+            </div>
+            <div class="tarjeta-estadistica">
+                <span class="estadistica-label">Descargas</span>
+                <span class="estadistica-valor" id="statDescargas">0</span>
+            </div>
+            <div class="tarjeta-estadistica">
+                <span class="estadistica-label">Me Gustas</span>
+                <span class="estadistica-valor" id="statLikes">0</span>
+            </div>
+        </section>
+
+        <div class="perfil-redes-dinamicas" id="perfilRedesDinamicasContenedor">
+            <a href="#" target="_blank" class="btn-red-perfil-cuadrado" id="lnkPerfilRedDiscord" title="Discord">
+                <svg viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a74.37,74.37,0,0,0,6.77-11,68.43,68.43,0,0,1-10.75-5.13c.91-.66,1.8-1.34,2.65-2a75.58,75.58,0,0,0,72.93,0c.85.69,1.74,1.37,2.65,2A68.44,68.44,0,0,1,96.1,85.37a74.49,74.49,0,0,0,6.77,11,105.73,105.73,0,0,0,31.06-18.83C130.1,49.22,124.27,26.4,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.88,46,53.88,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.12,46,96.12,53,91,65.69,84.69,65.69Z"/></svg>
+            </a>
+            <a href="#" target="_blank" class="btn-red-perfil-cuadrado svg-stroke-forced" id="lnkPerfilRedWhatsapp" title="WhatsApp">
+                <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.5 8.5 0 0 1-7.6-4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            </a>
+            <a href="#" target="_blank" class="btn-red-perfil-cuadrado" id="lnkPerfilRedTiktok" title="TikTok">
+                <svg viewBox="0 0 448 512"><path d="M448 209.9a210.1 210.1 0 0 1 -122.8-39.3V349.4A162.6 162.6 0 1 1 185 188.3V278.2a74.6 74.6 0 1 0 52.2 71.2V0l88 0a121.2 121.2 0 0 0 1.9 22.2h0A122.2 122.2 0 0 0 381 102.4a121.4 121.4 0 0 0 67 20.1z"/></svg>
+            </a>
+            <a href="#" target="_blank" class="btn-red-perfil-cuadrado svg-stroke-forced" id="lnkPerfilRedYoutube" title="YouTube">
+                <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+            </a>
+            <a href="#" target="_blank" class="btn-red-perfil-cuadrado svg-stroke-forced" id="lnkPerfilRedWeb" title="Web">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </a>
+        </div>
+
+        <section class="seccion-addons-publicados">
+            <h3 class="perfil-seccion-titulo">Add-Ons Publicados</h3>
+            <div class="contenedor-addons-publicados">
+                <div class="perfil-estado-vacio" id="estadoVacioAddons" style="display:none;">
+                    <img src="../img/icons/ic2.gif" alt="Icono Vacío">
+                    <p>No tienes Add-Ons publicados actualmente.</p>
+                </div>
+                <div class="grid-addons-usuario" id="gridAddonsUsuario"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="interfaz-editar-perfil" id="panelEditor">
+        <div class="interfaz-editar-contenedor">
+            <h3 class="editar-cabecera-titulo">Editar Perfil</h3>
+            
+            <div class="editar-banner-seccion-wrapper">
+                <div class="editar-banner-vista" id="bloqueCambiarBanner">
+                    <div class="editar-banner-overlay">
+                        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </div>
+                </div>
+                <div class="editar-avatar-bloque" id="bloqueCambiarFoto">
+                    <div class="editar-marco-avatar" id="panelEditorAvatarVista">
+                        <svg viewBox="0 0 24 24" id="svgEditorAvatarPorDefecto"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="editar-avatar-overlay">
+                        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <input type="file" id="inputArchivoAvatar" accept="image/*" style="display: none;">
+            <input type="file" id="inputArchivoBanner" accept="image/*" style="display: none;">
+
+            <div class="editar-formulario">
+                <div class="editar-campo-grupo">
+                    <label for="txtEditNombreVisible">Nombre Visible</label>
+                    <input type="text" id="txtEditNombreVisible" class="editar-input">
+                </div>
+                
+                <div class="editar-campo-grupo">
+                    <label for="txtEditNombreUsuario">Nombre de Usuario</label>
+                    <input type="text" id="txtEditNombreUsuario" class="editar-input" readonly style="opacity: 0.6; cursor: not-allowed;">
+                </div>
+
+                <div class="editar-campo-grupo">
+                    <label for="txtEditBiografia">Biografía</label>
+                    <textarea id="txtEditBiografia" class="editar-textarea"></textarea>
+                </div>
+
+                <div class="editar-redes-seccion">
+                    <span class="editar-redes-titulo">Redes Sociales</span>
+                    
+                    <div class="editar-campo-grupo">
+                        <label for="txtDiscord">Discord</label>
+                        <input type="text" id="txtDiscord" class="editar-input" placeholder="https://discord.gg/...">
+                    </div>
+                    
+                    <div class="editar-campo-grupo">
+                        <label for="txtWhatsapp">WhatsApp</label>
+                        <input type="text" id="txtWhatsapp" class="editar-input" placeholder="https://wa.me/...">
+                    </div>
+                    
+                    <div class="editar-campo-grupo">
+                        <label for="txtTiktok">TikTok</label>
+                        <input type="text" id="txtTiktok" class="editar-input" placeholder="https://tiktok.com/@...">
+                    </div>
+                    
+                    <div class="editar-campo-grupo">
+                        <label for="txtYoutube">YouTube</label>
+                        <input type="text" id="txtYoutube" class="editar-input" placeholder="https://youtube.com/...">
+                    </div>
+                    
+                    <div class="editar-campo-grupo">
+                        <label for="txtWeb">Web</label>
+                        <input type="text" id="txtWeb" class="editar-input" placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="editar-botones-acciones">
+                    <button class="btn-editar-cancelar" id="btnCancelarEdicion">Cancelar</button>
+                    <button class="btn-editar-guardar" id="btnGuardarEdicion">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/profile.js"></script>
+</body>
+</html>

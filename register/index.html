@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link class="forgegames-logo-ref" rel="icon" type="image/png" href="../img/logo.png">
+    <title>Registro - ForgeGames</title>
+    <link rel="stylesheet" href="../css/register.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" crossorigin="anonymous"></script>
+    <script src="../js/db.js"></script>
+    <script src="../js/mcshared.js"></script>
+</head>
+<body>
+
+    <div class="pantalla-contenedor" id="contenedorPrincipal">
+        <div class="panel-lateral">
+            <h1>¡Registrate Ahora!</h1>
+            <p>Crea tu perfil dentro de ForgeGames y empieza a publicar tus propias creaciones, recibir valoraciones de la comunidad y conectar con otros creadores de contenido de Bedrock.</p>
+        </div>
+
+        <div class="login-contenedor">
+            <div class="login-cabecera">
+                <img src="../img/logo.png" alt="ForgeGames Logo" class="logo">
+                <h2 class="login-titulo">Crear Cuenta</h2>
+                <p class="login-subtitulo">Únete a la comunidad de ForgeGames</p>
+            </div>
+
+            <form id="formularioRegistro" onsubmit="procesarRegistro(event)">
+                <div class="grupo-formulario">
+                    <label class="label-formulario">Nombre Visible</label>
+                    <div class="input-contenedor">
+                        <svg class="icono-principal" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <input type="text" id="regNombreVisible" class="input-formulario" required placeholder="Mi Nombre" style="padding-right: 14px;">
+                    </div>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label class="label-formulario">Nombre De Usuario</label>
+                    <div class="input-contenedor">
+                        <svg class="icono-principal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+                        <input type="text" id="regUsuario" class="input-formulario" required placeholder="usuario" oninput="verificarDisponibilidadUsuario()" style="padding-right: 14px;">
+                    </div>
+                    <div class="msg-validacion" id="regUsuarioFeedback"></div>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label class="label-formulario">Contraseña</label>
+                    <div class="input-contenedor">
+                        <svg class="icono-principal" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="password" id="regContrasena" class="input-formulario" required placeholder="••••••••">
+                        <button type="button" class="btn-visibilidad" id="btnAlternarRegPassword" onclick="alternarVisibilidadRegPassword('regContrasena', 'iconoOjoReg1')">
+                            <svg id="iconoOjoReg1" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label class="label-formulario">Confirmar Contraseña</label>
+                    <div class="input-contenedor">
+                        <svg class="icono-principal" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="password" id="regConfirmarContrasena" class="input-formulario" required placeholder="••••••••">
+                        <button type="button" class="btn-visibilidad" id="btnAlternarRegConfirmPassword" onclick="alternarVisibilidadRegPassword('regConfirmarContrasena', 'iconoOjoReg2')">
+                            <svg id="iconoOjoReg2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <div class="msg-validacion msg-error" id="errorConfirmacion">Las contraseñas no coinciden.</div>
+                </div>
+
+                <button type="submit" class="btn-enviar" id="btnSubmit">Registrarse</button>
+            </form>
+
+            <div class="login-pie">
+                ¿Ya tienes cuenta? <a href="../login/" id="enlaceLogin" onclick="transicionSalida(event, '../login/')">Inicia Sesión</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/register.js"></script>
+</body>
+</html>

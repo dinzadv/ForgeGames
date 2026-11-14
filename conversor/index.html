@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForgeGames - Tools</title>
+
+    <meta property="og:title" content="ForgeGames - Tools">
+    <meta property="og:description" content="Conversor avanzado para Minecraft Bedrock. Transforma tus archivos .zip a formatos nativos como .mcaddon, .mcpack, .mcworld y .mctemplate de forma rápida.">
+    <meta property="og:image" content="../img/ft/f2.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ForgeGames - Tools">
+    <meta name="twitter:description" content="Conversor avanzado para Minecraft Bedrock. Transforma tus archivos .zip a formatos nativos como .mcaddon, .mcpack, .mcworld y .mctemplate de forma rápida.">
+    <meta name="twitter:image" content="../img/ft/f2.jpg">
+    <meta name="theme-color" content="#00f0ff">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link class="forgegames-logo-ref" rel="icon" type="image/png" href="../img/logo.png">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/conversor.css">
+</head>
+<body>
+
+    <header>
+        <a href="../" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Volver
+        </a>
+        <div class="header-main-content">
+            <h1>ForgeGames Tools</h1>
+            <p>Convertir .Zip a formatos de Minecraft nativos de manera rapida y segura sin ver anuncios</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="left-panel">
+            <div class="drop-zone-container" id="drop-container">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z" />
+                </svg>
+                <span>Arrastra el paquete original en formato .zip o haz clic para explorar</span>
+                <input type="file" id="file-input" accept=".zip">
+            </div>
+
+            <div class="status-box" id="status-box">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div class="file-title" id="file-title">Ningún archivo cargado</div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="section-title">Formato de salida</div>
+            
+            <div class="options-list">
+                <div class="option-wrapper">
+                    <input type="radio" name="fmt" id="f1" value=".mcaddon" checked>
+                    <label for="f1" class="option-content">
+                        <img src="../img/icons/ic6.jpg" alt="Format Icon" class="format-img">
+                        <span class="format-text">.mcaddon</span>
+                    </label>
+                </div>
+                <div class="option-wrapper">
+                    <input type="radio" name="fmt" id="f2" value=".mcpack">
+                    <label for="f2" class="option-content">
+                        <img src="../img/icons/ic6.jpg" alt="Format Icon" class="format-img">
+                        <span class="format-text">.mcpack</span>
+                    </label>
+                </div>
+                <div class="option-wrapper">
+                    <input type="radio" name="fmt" id="f3" value=".mcworld">
+                    <label for="f3" class="option-content">
+                        <img src="../img/icons/ic6.jpg" alt="Format Icon" class="format-img">
+                        <span class="format-text">.mcworld</span>
+                    </label>
+                </div>
+                <div class="option-wrapper">
+                    <input type="radio" name="fmt" id="f4" value=".mctemplate">
+                    <label for="f4" class="option-content">
+                        <img src="../img/icons/ic6.jpg" alt="Format Icon" class="format-img">
+                        <span class="format-text">.mctemplate</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="view-preview-box">
+                <div class="output-string" id="output-string">(Nombre del archivo) [ForgeGames].(formato)</div>
+            </div>
+
+            <button class="trigger-btn" id="trigger-btn" disabled>
+                Descargar Archivo
+            </button>
+        </div>
+    </main>
+
+    <footer>
+        <span>&copy; 2026 ForgeGames Tools. Todos los derechos reservados.</span>
+        <div class="footer-branding">
+            <img src="../img/icons/ic8.png" alt="Icon 8" class="footer-img">
+            <span class="footer-divider">•</span>
+            <img src="../img/icons/ic9.png" alt="Icon 9" class="footer-img">
+        </div>
+    </footer>
+
+    <div class="download-overlay" id="download-overlay">
+        <div class="download-modal">
+            <div class="captcha-pulse" id="captcha-pulse"></div>
+            <img src="../img/icons/ic7.png" alt="Status" class="status-img">
+            <div class="download-title">Descargando<span class="dots"></span></div>
+            
+            <div class="progress-container">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+            <div class="percentage-display" id="percentage-display">0%</div>
+            
+            <div class="robot-desc">
+                Verificando que no seas un Robot, No Cierres la pagina esto terminara pronto.
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/conversor.js"></script>
+</body>
+</html>
