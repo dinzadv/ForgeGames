@@ -39,18 +39,41 @@
 
     if (!window.supabase || !window.supabase.createClient) {
         console.error('ForgeGames: no se pudo cargar la librería de Supabase (revisa tu conexión o bloqueadores de contenido).');
-        window.addEventListener('DOMContentLoaded', function () {
-            var aviso = document.createElement('div');
-            aviso.textContent = 'No se pudo conectar con el servidor. Recarga la página o desactiva el bloqueador de contenido.';
-            aviso.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;padding:10px 16px;background:#b91c1c;color:#fff;font:14px sans-serif;text-align:center';
-            document.body.appendChild(aviso);
-        });
+        avisar('No se pudo cargar la librería de Supabase.\nRevisa tu conexión o desactiva el bloqueador de contenido y recarga la página.');
         window.mcDB = crearBloqueado('No se pudo conectar con el servidor.');
         return;
     }
 
-    var URL_BASE = _d(_C.u);
-    var cliente = window.supabase.createClient(URL_BASE, _d(_C.k), {
+    var URL_BASE = '';
+    var CLAVE = '';
+    try {
+        URL_BASE = _d(_C.u);
+        CLAVE = _d(_C.k);
+    } catch (e) { }
+
+    function avisar(texto, color) {
+        function poner() {
+            var d = document.getElementById('fg-aviso');
+            if (!d) {
+                d = document.createElement('div');
+                d.id = 'fg-aviso';
+                d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;padding:12px 16px;font:14px/1.4 sans-serif;color:#fff;white-space:pre-line;text-align:left;max-height:60vh;overflow:auto';
+                document.body.appendChild(d);
+            }
+            d.style.background = color || '#b91c1c';
+            d.textContent = texto;
+        }
+        if (document.body) poner(); else document.addEventListener('DOMContentLoaded', poner);
+    }
+
+    if (!/^https:\/\/[a-z0-9]{20}\.supabase\.co$/.test(URL_BASE) || CLAVE.indexOf('sb_publishable_') !== 0) {
+        console.error('ForgeGames: la configuración de conexión está dañada.');
+        avisar('Configuración de conexión dañada. Regenera el bloque _C con: node scripts/ofuscar.js <ID> <KEY>');
+        window.mcDB = crearBloqueado('Configuración dañada.');
+        return;
+    }
+
+    var cliente = window.supabase.createClient(URL_BASE, CLAVE, {
         auth: {
             persistSession: true,
             autoRefreshToken: true,
@@ -406,6 +429,56 @@
     cliente.imagenADataURL = imagenADataURL;
     cliente.ajustes = AJUSTES;
     cliente.cache = cache;
+
+    function traducir(err) {
+        var m = String((err && (err.message || err.error_description)) || err || '');
+        var c = String((err && err.code) || '');
+        if (/Failed to fetch|NetworkError|Load failed|network/i.test(m)) return 'No se pudo alcanzar Supabase. Puede estar pausado el proyecto (Supabase > Project > Restore), no haber internet o haber un bloqueador de contenido.';
+        if (/Invalid API key|apikey|JWT/i.test(m)) return 'La clave de Supabase no es válida o fue regenerada. Revisa la Publishable key en Project Settings > API Keys.';
+        if (c === 'PGRST205' || c === '42P01' || /Could not find the table|does not exist/i.test(m)) return 'Las tablas no existen en esta base de datos. Ejecuta el SQL completo en el SQL Editor.';
+        if (c === '42501' || /permission denied/i.test(m)) return 'Faltan permisos en las tablas. Vuelve a ejecutar el SQL completo (incluye los GRANT y las políticas RLS).';
+        return m || 'Error desconocido.';
+    }
+
+    function comprobarConexion(detallado) {
+        var lineas = [];
+        function ok(t) { lineas.push('OK  ' + t); }
+        function mal(t) { lineas.push('ERROR  ' + t); }
+        ok('Librería de Supabase cargada');
+        ok('Configuración: ' + URL_BASE.slice(0, 16) + '…supabase.co | clave ' + CLAVE.slice(0, 15) + '… (' + CLAVE.length + ' caracteres)');
+        return fetch(URL_BASE + '/auth/v1/health', { headers: { apikey: CLAVE } })
+            .then(function (r) {
+                if (r.ok) ok('Servidor de autenticación responde (' + r.status + ')');
+                else mal('Servidor de autenticación respondió ' + r.status);
+            }, function (e) { mal('Sin conexión con Supabase: ' + traducir(e)); })
+            .then(function () { return cliente.from('tipos_publicacion').select('id').limit(1); })
+            .then(function (res) {
+                if (res.error) { mal('Tablas: ' + traducir(res.error)); return false; }
+                ok('Tablas accesibles (' + (res.data || []).length + ' filas de prueba)');
+                return true;
+            }, function (e) { mal('Tablas: ' + traducir(e)); return false; })
+            .then(function (tablasOk) {
+                var hayError = lineas.some(function (l) { return l.indexOf('ERROR') === 0; });
+                if (hayError) avisar('No se pudo conectar con la base de datos\n' + lineas.join('\n'));
+                else if (detallado) avisar('Conexión correcta\n' + lineas.join('\n'), '#15803d');
+                return tablasOk;
+            });
+    }
+
+    var pedirDiagnostico = /[?&]diag=1(&|$)/.test(location.search);
+    function iniciarComprobacion() {
+        var hecho = false;
+        try { hecho = sessionStorage.getItem('fg_diag_ok') === '1'; } catch (e) { }
+        if (hecho && !pedirDiagnostico) return;
+        comprobarConexion(pedirDiagnostico).then(function (bien) {
+            if (bien) { try { sessionStorage.setItem('fg_diag_ok', '1'); } catch (e) { } }
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciarComprobacion);
+    else iniciarComprobacion();
+
+    cliente.diagnostico = function () { return comprobarConexion(true); };
+    cliente.traducirError = traducir;
 
     window.mcDB = cliente;
 })();
