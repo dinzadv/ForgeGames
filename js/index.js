@@ -686,7 +686,7 @@ async function cambiarVista(vista, opts = {}) {
     btnBurbujaVerTodos.classList.toggle('activo', esTodos);
 
     document.getElementById('menuLinkInicio').classList.toggle('activo-link', esInicio || esTodos);
-    const enlacesTipo = { modelos: 'menuLinkModelos', sprites: 'menuLinkSprites', servidores: 'menuLinkServidores' };
+    const enlacesTipo = { modelos: 'menuLinkModelos', sprites: 'menuLinkSprites', mapas: 'menuLinkMapas', servidores: 'menuLinkServidores' };
     document.getElementById('menuLinkCategorias').classList.toggle('activo-link', vista === 'categorias' || (vista === 'categoria' && !enlacesTipo[opts.id]));
     Object.keys(enlacesTipo).forEach(idCat => {
         const enlace = document.getElementById(enlacesTipo[idCat]);

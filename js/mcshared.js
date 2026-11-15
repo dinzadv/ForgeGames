@@ -21,6 +21,12 @@
             icono: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>'
         },
         {
+            id: 'mapa', catId: 'mapas', nombre: 'Mapa', plural: 'Mapas',
+            desc: 'Mundos, aventuras y construcciones listos para jugar.',
+            c: '#f59e0b', osc: '#b45309', t: '#1f1300',
+            icono: '<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>'
+        },
+        {
             id: 'servidor', catId: 'servidores', nombre: 'Servidor', plural: 'Servidores',
             desc: 'Servidores de Java, Bedrock y Realms para jugar con otros.',
             c: '#43b039', osc: '#2c8a26', t: '#ffffff',
@@ -96,7 +102,7 @@
         return simboloMoneda(addon.precio_moneda) + txt + ' ' + (addon.precio_moneda || '');
     }
 
-    var NOMBRE_TIPO_VENTA = { addon: 'Add-On', modelo: 'Modelo', sprites: 'Sprite' };
+    var NOMBRE_TIPO_VENTA = { addon: 'Add-On', modelo: 'Modelo', sprites: 'Sprite', mapa: 'Mapa' };
 
     function contactoVenta(addon) {
         var wa = String((addon && addon.contacto_whatsapp) || '').replace(/\D/g, '');

@@ -44,7 +44,8 @@ insert into public.tipos_publicacion (id, cat_id, nombre, plural, descripcion, o
 ('addon', 'addons', 'Add-On', 'Add-Ons', 'Mecánicas, armas y comportamientos nuevos para jugar distinto.', 1),
 ('modelo', 'modelos', 'Modelo', 'Modelos', 'Entidades, bloques y objetos 3D con forma propia.', 2),
 ('sprites', 'sprites', 'Menús y Sprites', 'Sprites/Menús', 'Interfaces, menús, iconos y sprites para personalizar el juego.', 3),
-('servidor', 'servidores', 'Servidor', 'Servidores', 'Servidores de Java, Bedrock y Realms para jugar con otros.', 4)
+('mapa', 'mapas', 'Mapa', 'Mapas', 'Mundos, aventuras y construcciones listos para jugar.', 4),
+('servidor', 'servidores', 'Servidor', 'Servidores', 'Servidores de Java, Bedrock y Realms para jugar con otros.', 5)
 on conflict (id) do update set
     cat_id = excluded.cat_id, nombre = excluded.nombre, plural = excluded.plural,
     descripcion = excluded.descripcion, orden = excluded.orden;

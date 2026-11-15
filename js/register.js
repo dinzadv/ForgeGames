@@ -1,3 +1,12 @@
+function destinoTrasSesion() {
+    try {
+        const v = sessionStorage.getItem('fg_volver');
+        sessionStorage.removeItem('fg_volver');
+        if (v && v.charAt(0) === '/' && v.charAt(1) !== '/' && v.charAt(1) !== '\\' && !/[\r\n]/.test(v)) return v;
+    } catch (e) { }
+    return '../';
+}
+
 let usuarioDisponible = false;
 const USUARIO_VALIDO = /^[a-z0-9_]{3,20}$/;
 let timeoutBusqueda = null;
@@ -126,7 +135,7 @@ async function procesarRegistro(e) {
 
         mcDB.invalidarPerfil();
         localStorage.setItem('mcpixel_interfaz_v2_sesion', nombreVisible);
-        window.location.href = '../';
+        window.location.href = destinoTrasSesion();
 
     } catch (error) {
         btnSubmit.textContent = 'Registrarse';

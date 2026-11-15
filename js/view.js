@@ -409,9 +409,22 @@ function cerrarMenuAlternativas() {
     if (btn) btn.setAttribute('aria-expanded', 'false');
 }
 
+function guardarRutaDeRetorno() {
+    try { sessionStorage.setItem('fg_volver', window.location.pathname + window.location.search); } catch (e) { }
+}
+
+function pedirSesionParaDescargar() {
+    guardarRutaDeRetorno();
+    window.location.href = rutasNavegacionAndEnlacesMcpixel.login;
+}
+
 async function manejarDescarga(e, addon, boton) {
     e.preventDefault();
     cerrarMenuAlternativas();
+    if (!currentUser) {
+        pedirSesionParaDescargar();
+        return;
+    }
 
     const ahora = Date.now();
     const ultimaDescarga = parseInt(localStorage.getItem('mcpixel_ultima_descarga_' + addon.id)) || 0;
@@ -882,7 +895,24 @@ async function renderizarView() {
         btnPrincipal.onclick = (e) => manejarDescarga(e, addon, principal);
 
         const alternativas = botonesDescarga.slice(1);
-        if (alternativas.length === 0) {
+        if (!currentUser) {
+            btnPrincipal.href = rutasNavegacionAndEnlacesMcpixel.login;
+            btnPrincipal.removeAttribute('target');
+            btnPrincipal.classList.add('requiere-sesion');
+            const textoBtn = btnPrincipal.querySelector('span');
+            if (textoBtn) textoBtn.textContent = 'Inicia sesión para descargar';
+            btnPrincipal.onclick = (e) => { e.preventDefault(); pedirSesionParaDescargar(); };
+            btnAlternativas.style.display = 'none';
+            menuAlternativas.style.display = 'none';
+            const aviso = document.getElementById('avisoDescargaSesion');
+            if (aviso) aviso.remove();
+            const nota = document.createElement('p');
+            nota.id = 'avisoDescargaSesion';
+            nota.className = 'aviso-descarga-sesion';
+            nota.innerHTML = 'Necesitas una cuenta para descargar. <a href="' + rutasNavegacionAndEnlacesMcpixel.login + '">Iniciar sesión</a> o <a href="' + rutasNavegacionAndEnlacesMcpixel.register + '">crear cuenta</a>.';
+            nota.querySelectorAll('a').forEach(a => a.addEventListener('click', guardarRutaDeRetorno));
+            filaDescarga.parentElement.appendChild(nota);
+        } else if (alternativas.length === 0) {
             btnAlternativas.style.display = 'none';
             menuAlternativas.style.display = 'none';
         } else {

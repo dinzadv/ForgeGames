@@ -159,6 +159,11 @@ const TEXTOS = {
         desc: 'Explica qué pantallas, iconos o sprites incluye y cómo se instalan...',
         etiquetas: 'Ej. menú, inventario, hud, iconos', boton: 'Publicar Menús y Sprites'
     },
+    mapa: {
+        titulo: 'Publica tu Mapa', nombre: 'Nombre del Mapa', ph: 'Ej. Aventura en la Isla Perdida',
+        desc: 'Cuenta de qué trata tu mapa, cómo se juega, versión recomendada y cómo instalarlo...',
+        etiquetas: 'Ej. aventura, parkour, supervivencia, minijuego', boton: 'Publicar Mapa'
+    },
     servidor: {
         titulo: 'Publica tu Servidor', nombre: 'Nombre del Servidor', ph: 'Ej. PixelCraft Network',
         desc: 'Cuenta de qué trata tu servidor, modalidades, reglas y qué lo hace especial...',

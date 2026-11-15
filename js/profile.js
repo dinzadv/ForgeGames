@@ -51,12 +51,6 @@ const lnkPerfilRedTiktok = document.getElementById('lnkPerfilRedTiktok');
 const lnkPerfilRedYoutube = document.getElementById('lnkPerfilRedYoutube');
 const lnkPerfilRedWeb = document.getElementById('lnkPerfilRedWeb');
 
-const statAddons = document.getElementById('statAddons');
-const statDescargas = document.getElementById('statDescargas');
-const statLikes = document.getElementById('statLikes');
-const estadoVacioAddons = document.getElementById('estadoVacioAddons');
-const gridAddonsUsuario = document.getElementById('gridAddonsUsuario');
-
 document.getElementById('logoInicio').addEventListener('click', () => {
     window.location.href = rutasNavegacionAndEnlacesMcpixel.inicio;
 });
@@ -263,88 +257,272 @@ function urlsImagenesDe(addon) {
     return [addon.portada, addon.banner].concat(McShared.listaJson(addon.referencias)).filter(Boolean);
 }
 
+const T = McShared;
+const estadoPublicaciones = { todas: [], tab: 'todo', orden: 'recientes', userId: null };
+
+function contarPorTipo(lista) {
+    const cuentas = {};
+    lista.forEach(p => {
+        const t = T.tipoDe(p);
+        cuentas[t] = (cuentas[t] || 0) + 1;
+    });
+    return cuentas;
+}
+
+function pintarEstadisticas() {
+    const lista = estadoPublicaciones.todas;
+    const cuentas = contarPorTipo(lista);
+    let descargas = 0;
+    let likes = 0;
+    lista.forEach(p => {
+        likes += parseInt(p.likes) || 0;
+        if (T.tipoDe(p) !== 'servidor') descargas += parseInt(p.descargas) || 0;
+    });
+
+    const tarjetas = [];
+    tarjetas.push(
+        '<div class="tarjeta-estadistica">' +
+            '<span class="estadistica-label">Publicaciones</span>' +
+            '<span class="estadistica-valor">' + lista.length + '</span>' +
+        '</div>'
+    );
+    T.TIPOS.forEach(t => {
+        if (!cuentas[t.id]) return;
+        tarjetas.push(
+            '<div class="tarjeta-estadistica estadistica-tipo" style="--c-tipo:' + t.c + '">' +
+                '<span class="estadistica-label">' + T.svgTipo(t) + T.esc(t.plural) + '</span>' +
+                '<span class="estadistica-valor">' + cuentas[t.id] + '</span>' +
+            '</div>'
+        );
+    });
+    if (lista.some(p => T.tipoDe(p) !== 'servidor')) {
+        tarjetas.push(
+            '<div class="tarjeta-estadistica">' +
+                '<span class="estadistica-label">Descargas</span>' +
+                '<span class="estadistica-valor">' + T.formatearNumero(descargas) + '</span>' +
+            '</div>'
+        );
+    }
+    tarjetas.push(
+        '<div class="tarjeta-estadistica">' +
+            '<span class="estadistica-label">Me Gustas</span>' +
+            '<span class="estadistica-valor">' + T.formatearNumero(likes) + '</span>' +
+        '</div>'
+    );
+    document.getElementById('gridEstadisticas').innerHTML = tarjetas.join('');
+}
+
+function pintarTabs() {
+    const cont = document.getElementById('tabsPublicaciones');
+    const lista = estadoPublicaciones.todas;
+    if (lista.length === 0) {
+        cont.style.display = 'none';
+        document.getElementById('bloqueOrden').style.display = 'none';
+        return;
+    }
+    cont.style.display = 'flex';
+    document.getElementById('bloqueOrden').style.display = 'flex';
+
+    const cuentas = contarPorTipo(lista);
+    if (estadoPublicaciones.tab !== 'todo' && !cuentas[estadoPublicaciones.tab]) estadoPublicaciones.tab = 'todo';
+    const tabs = [{ id: 'todo', nombre: 'Todo', cantidad: lista.length, tipo: null }];
+    T.TIPOS.forEach(t => {
+        if (cuentas[t.id]) tabs.push({ id: t.id, nombre: t.plural, cantidad: cuentas[t.id], tipo: t });
+    });
+
+    cont.innerHTML = tabs.map(tab => {
+        const activo = tab.id === estadoPublicaciones.tab ? ' activo' : '';
+        const estilo = tab.tipo ? ' style="--ac:' + tab.tipo.c + ';--ac-osc:' + tab.tipo.osc + ';--ac-t:' + tab.tipo.t + '"' : '';
+        const icono = tab.tipo ? T.svgTipo(tab.tipo) : '';
+        return '<button type="button" class="perfil-tab' + activo + '" role="tab" data-tab="' + tab.id + '"' +
+            ' aria-selected="' + (activo ? 'true' : 'false') + '"' + estilo + '>' +
+            icono + '<span>' + T.esc(tab.nombre) + '</span><span class="tab-cantidad">' + tab.cantidad + '</span></button>';
+    }).join('');
+
+    cont.querySelectorAll('.perfil-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            estadoPublicaciones.tab = btn.dataset.tab;
+            const url = new URL(window.location.href);
+            if (btn.dataset.tab === 'todo') url.searchParams.delete('tab');
+            else url.searchParams.set('tab', btn.dataset.tab);
+            window.history.replaceState({}, '', url.toString());
+            pintarTabs();
+            pintarPublicaciones();
+        });
+    });
+}
+
+function ordenarPublicaciones(lista) {
+    const orden = estadoPublicaciones.orden;
+    const copia = lista.slice();
+    if (orden === 'likes') {
+        copia.sort((a, b) => (parseInt(b.likes) || 0) - (parseInt(a.likes) || 0));
+    } else if (orden === 'descargas') {
+        copia.sort((a, b) => (parseInt(b.descargas) || 0) - (parseInt(a.descargas) || 0));
+    }
+    return copia;
+}
+
+function listaEtiquetas(pub) {
+    return String(pub.etiquetas || '').split(',').map(e => e.trim()).filter(Boolean);
+}
+
+function botonesPropietario(pub) {
+    const caja = document.createElement('div');
+    caja.className = 'addon-acciones-botones';
+    caja.innerHTML =
+        '<a href="' + rutasNavegacionAndEnlacesMcpixel.view + '?id=' + T.esc(pub.id) + '" class="btn-addon-accion ver" title="Ver">' +
+            '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>' +
+        '</a>' +
+        '<a href="' + rutasNavegacionAndEnlacesMcpixel.postEdit + '?id=' + T.esc(pub.id) + '" class="btn-addon-accion editar" title="Editar">' +
+            '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+        '</a>' +
+        '<button type="button" class="btn-addon-accion eliminar" title="Eliminar">' +
+            '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>' +
+        '</button>';
+    caja.addEventListener('click', e => e.stopPropagation());
+    caja.querySelector('.eliminar').addEventListener('click', async () => {
+        const nombreTipo = T.TIPO_POR_ID[T.tipoDe(pub)].nombre;
+        if (!(await confirmarEliminacion(nombreTipo, pub.nombre))) return;
+        try {
+            const { data: borrados, error: errorBorrar } = await mcDB
+                .from('addons')
+                .delete()
+                .eq('id', pub.id)
+                .select('id');
+            if (errorBorrar) throw errorBorrar;
+            if (!borrados || borrados.length === 0) throw new Error('No se pudo eliminar la publicación.');
+
+            await mcDB.imagenes.borrar(urlsImagenesDe(pub));
+            mcDB.invalidarContenido();
+
+            await cargarAddonsDelUsuario(estadoPublicaciones.userId, true);
+        } catch (err) {
+            alert('Error al eliminar: ' + err.message);
+        }
+    });
+    return caja;
+}
+
+function tarjetaNormal(pub) {
+    const tarjeta = document.createElement('div');
+    tarjeta.className = 'tarjeta-premium-addon';
+
+    const extras = [];
+    const plat = T.tipoDe(pub) !== 'servidor' && pub.plataforma && T.PLATAFORMAS_SERVIDOR[pub.plataforma];
+    if (plat) extras.push('<span class="etiqueta-mini plataforma">' + T.esc(plat) + '</span>');
+    listaEtiquetas(pub).slice(0, 3).forEach(et => extras.push('<span class="etiqueta-mini">#' + T.esc(et) + '</span>'));
+
+    tarjeta.innerHTML = T.cardInterior(pub, { usarBanner: true, imgError: '../img/icons/ic5.png' }) +
+        (extras.length ? '<div class="perfil-tarjeta-extra">' + extras.join('') + '</div>' : '');
+    tarjeta.appendChild(botonesPropietario(pub));
+    return tarjeta;
+}
+
+function tarjetaServidor(srv) {
+    const esRealm = srv.plataforma === 'realms';
+    const multi = !!srv.multiplataforma && !esRealm;
+    const imagen = T.urlSegura(srv.banner) || srv.banner || srv.portada || '';
+
+    const chips = [];
+    if (esRealm) chips.push('Realms');
+    else if (multi) chips.push('Java', 'Bedrock');
+    else chips.push(T.PLATAFORMAS_SERVIDOR[srv.plataforma] || 'Java');
+
+    const puertoJava = srv.puerto_java || (srv.plataforma === 'java' ? srv.puerto : '') || T.PUERTO_POR_DEFECTO.java;
+    const puertoBedrock = srv.puerto_bedrock || (srv.plataforma === 'bedrock' ? srv.puerto : '') || T.PUERTO_POR_DEFECTO.bedrock;
+
+    const datos = [];
+    datos.push(['Plataforma', T.etiquetaPlataformaServidor(srv)]);
+    datos.push(['Versión', srv.version || 'Cualquiera']);
+    if (!esRealm) {
+        if (srv.plataforma === 'java' || multi) datos.push(['Puerto Java', puertoJava]);
+        if (srv.plataforma === 'bedrock' || multi) datos.push(['Puerto Bedrock', puertoBedrock]);
+    }
+    datos.push(['Publicado', T.fechaCorta(srv)]);
+
+    const tags = listaEtiquetas(srv).slice(0, 5).map(et => '<span class="etiqueta-mini">#' + T.esc(et) + '</span>').join('');
+    const textoIp = esRealm ? 'Realm de Minecraft' : (T.textoIp(srv) || 'Sin IP');
+
+    const tarjeta = document.createElement('article');
+    tarjeta.className = 'tarjeta-servidor';
+    tarjeta.innerHTML =
+        '<div class="srv-banner">' +
+            (imagen ? '<img src="' + T.esc(imagen) + '" alt="' + T.esc(srv.nombre || 'Servidor') + '" onerror="this.style.display=\'none\'">' : '') +
+            '<div class="srv-plataformas">' + chips.map(c => '<span class="srv-chip">' + T.esc(c) + '</span>').join('') + '</div>' +
+            '<div class="srv-likes">' + T.iconos.like + '<span>' + T.formatearNumero(srv.likes) + '</span></div>' +
+        '</div>' +
+        '<div class="srv-cuerpo">' +
+            '<h4 class="srv-nombre">' + T.esc(srv.nombre || 'Sin nombre') + '</h4>' +
+            '<div class="srv-ip"><code title="Dirección del servidor">' + T.esc(textoIp) + '</code></div>' +
+            '<p class="srv-desc">' + T.esc(srv.descripcion || 'Sin descripción disponible.') + '</p>' +
+            '<div class="srv-datos">' + datos.map(d => '<div class="srv-dato"><small>' + T.esc(d[0]) + '</small><span>' + T.esc(d[1]) + '</span></div>').join('') + '</div>' +
+            (tags ? '<div class="srv-tags">' + tags + '</div>' : '') +
+        '</div>';
+    tarjeta.appendChild(botonesPropietario(srv));
+    return tarjeta;
+}
+
+function pintarPublicaciones() {
+    const grid = document.getElementById('gridAddonsUsuario');
+    const vacio = document.getElementById('estadoVacioAddons');
+    const titulo = document.getElementById('tituloPublicaciones');
+    const tab = estadoPublicaciones.tab;
+    const enTab = tab === 'todo' ? estadoPublicaciones.todas : estadoPublicaciones.todas.filter(p => T.tipoDe(p) === tab);
+
+    titulo.textContent = tab === 'todo' ? 'Mis publicaciones' : 'Mis ' + T.TIPO_POR_ID[tab].plural.toLowerCase();
+
+    const optDescargas = document.querySelector('#selOrden option[value="descargas"]');
+    if (optDescargas) optDescargas.hidden = tab === 'servidor';
+    if (tab === 'servidor' && estadoPublicaciones.orden === 'descargas') {
+        estadoPublicaciones.orden = 'recientes';
+        document.getElementById('selOrden').value = 'recientes';
+    }
+
+    if (enTab.length === 0) {
+        vacio.style.display = 'flex';
+        document.getElementById('textoEstadoVacio').textContent = 'No tienes publicaciones actualmente.';
+        grid.style.display = 'none';
+        return;
+    }
+
+    vacio.style.display = 'none';
+    grid.style.display = 'grid';
+    grid.classList.toggle('grid-servidores', tab === 'servidor');
+    grid.innerHTML = '';
+    ordenarPublicaciones(enTab).forEach(pub => {
+        grid.appendChild(T.tipoDe(pub) === 'servidor' && tab === 'servidor' ? tarjetaServidor(pub) : tarjetaNormal(pub));
+    });
+}
+
+document.getElementById('selOrden').addEventListener('change', (e) => {
+    estadoPublicaciones.orden = e.target.value;
+    pintarPublicaciones();
+});
+
 async function cargarAddonsDelUsuario(userId, forzar) {
     try {
-        const addons = await mcDB.addonsDeUsuario(userId, forzar);
+        const publicaciones = await mcDB.addonsDeUsuario(userId, forzar);
+        estadoPublicaciones.userId = userId;
+        estadoPublicaciones.todas = publicaciones;
 
-        let totalDescargas = 0;
-        let totalLikes = 0;
-
-        addons.forEach(addon => {
-            totalDescargas += parseInt(addon.descargas) || 0;
-            totalLikes += parseInt(addon.likes) || 0;
-        });
-
-        statAddons.textContent = addons.length;
-        statDescargas.textContent = formatearNumero(totalDescargas);
-        statLikes.textContent = formatearNumero(totalLikes);
-
-        if (addons.length === 0) {
-            estadoVacioAddons.style.display = 'flex';
-            gridAddonsUsuario.style.display = 'none';
-            return;
+        if (!estadoPublicaciones.inicializado) {
+            estadoPublicaciones.inicializado = true;
+            const tabPedida = new URLSearchParams(window.location.search).get('tab');
+            if (tabPedida && T.TIPO_POR_ID[tabPedida] && publicaciones.some(p => T.tipoDe(p) === tabPedida)) {
+                estadoPublicaciones.tab = tabPedida;
+            }
         }
 
-        estadoVacioAddons.style.display = 'none';
-        gridAddonsUsuario.style.display = 'grid';
-        gridAddonsUsuario.innerHTML = '';
-
-        addons.forEach(addon => {
-            const tarjeta = document.createElement('div');
-            tarjeta.className = 'tarjeta-premium-addon';
-            const fecha = addon.fecha ? new Date(addon.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Reciente';
-
-            let urlPortada = "../img/icons/ic5.png"; 
-            if (addon.portada) {
-                urlPortada = addon.portada;
-            }
-
-            tarjeta.innerHTML = `
-                ${McShared.cardInterior(addon, { usarBanner: true, imgError: '../img/icons/ic5.png' })}
-                <div class="addon-acciones-botones">
-                    <a href="${rutasNavegacionAndEnlacesMcpixel.view}?id=${addon.id}" class="btn-addon-accion ver" title="Ver">
-                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </a>
-                    <a href="${rutasNavegacionAndEnlacesMcpixel.postEdit}?id=${addon.id}" class="btn-addon-accion editar" title="Editar">
-                        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    </a>
-                    <button class="btn-addon-accion eliminar" data-id="${addon.id}" title="Eliminar">
-                        <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    </button>
-                </div>
-            `;
-
-            tarjeta.querySelector('.eliminar').addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const nombreTipo = McShared.TIPO_POR_ID[McShared.tipoDe(addon)].nombre;
-                if (await confirmarEliminacion(nombreTipo, addon.nombre)) {
-                    try {
-                        const { data: borrados, error: errorBorrar } = await mcDB
-                            .from('addons')
-                            .delete()
-                            .eq('id', addon.id)
-                            .select('id');
-                        if (errorBorrar) throw errorBorrar;
-                        if (!borrados || borrados.length === 0) throw new Error('No se pudo eliminar la publicación.');
-
-                        await mcDB.imagenes.borrar(urlsImagenesDe(addon));
-                        mcDB.invalidarContenido();
-
-                        await cargarAddonsDelUsuario(userId, true);
-                    } catch (err) {
-                        alert("Error al eliminar Addon: " + err.message);
-                    }
-                }
-            });
-
-            gridAddonsUsuario.appendChild(tarjeta);
-        });
-
+        pintarEstadisticas();
+        pintarTabs();
+        pintarPublicaciones();
     } catch (error) {
-        console.error("Error cargando addons:", error);
-        estadoVacioAddons.style.display = 'flex';
-        estadoVacioAddons.querySelector('p').textContent = 'Error al cargar los add-ons.';
-        gridAddonsUsuario.style.display = 'none';
+        console.error("Error cargando publicaciones:", error);
+        const vacio = document.getElementById('estadoVacioAddons');
+        vacio.style.display = 'flex';
+        document.getElementById('textoEstadoVacio').textContent = 'Error al cargar las publicaciones.';
+        document.getElementById('gridAddonsUsuario').style.display = 'none';
     }
 }
 

@@ -198,7 +198,22 @@
         cache.borrar('usuarios');
     };
 
-    cliente.auth.onAuthStateChange(function (evento) {
+    function mostrarPublicar(hay) {
+        var enlace = document.getElementById('menuLinkPublicar');
+        if (enlace) enlace.style.display = hay ? '' : 'none';
+        var boton = document.getElementById('btnPublicarPerfil');
+        if (boton) boton.style.display = hay ? '' : 'none';
+    }
+    function revisarPublicar() {
+        cliente.auth.getSession().then(function (r) {
+            mostrarPublicar(!!(r && r.data && r.data.session && r.data.session.user));
+        }).catch(function () { });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', revisarPublicar);
+    else revisarPublicar();
+
+    cliente.auth.onAuthStateChange(function (evento, sesion) {
+        mostrarPublicar(!!(sesion && sesion.user));
         if (evento === 'SIGNED_OUT') {
             cache.borrar('likes:');
             cache.borrar('favorites:');
